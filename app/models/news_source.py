@@ -1,19 +1,15 @@
 """Beanie Document model for NewsSource collection."""
 
 from beanie import Document
-from pydantic import Field
+from pydantic import BaseModel, Field
 
 
-class Feed(Document):
+class Feed(BaseModel):
     """Embedded document for a news feed within a source."""
     
     link: str
     category: str  # COMPANIES, ECONOMY, TECHNOLOGY, etc.
     hasImage: bool = Field(alias="hasImage", default=False)
-    
-    class Settings:
-        # This is an embedded document, not a standalone collection
-        pass
 
 
 class NewsSource(Document):

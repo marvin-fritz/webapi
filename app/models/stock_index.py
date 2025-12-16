@@ -3,10 +3,10 @@
 from datetime import datetime, timezone
 
 from beanie import Document
-from pydantic import Field
+from pydantic import BaseModel, Field
 
 
-class StockIdentifiers(Document):
+class StockIdentifiers(BaseModel):
     """Embedded document for stock identifiers."""
     
     isin: str | None = None
@@ -15,20 +15,20 @@ class StockIdentifiers(Document):
     cik: int | None = None
 
 
-class InsiderTradingScan(Document):
+class InsiderTradingScan(BaseModel):
     """Embedded document for insider trading scan metadata."""
     
     latestScan: datetime | None = None
     lastAccession: str | None = None
 
 
-class QuarterlyFinancialsScan(Document):
+class QuarterlyFinancialsScan(BaseModel):
     """Embedded document for quarterly financials scan metadata."""
     
     latestScan: datetime | None = None
 
 
-class StockScans(Document):
+class StockScans(BaseModel):
     """Embedded document for scan metadata."""
     
     insiderTrading: InsiderTradingScan | None = None

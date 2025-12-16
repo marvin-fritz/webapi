@@ -4,10 +4,10 @@ from datetime import datetime, timezone
 from decimal import Decimal
 
 from beanie import Document
-from pydantic import Field
+from pydantic import BaseModel, Field
 
 
-class InsiderTradeLookup(Document):
+class InsiderTradeLookup(BaseModel):
     """Embedded document for lookup metadata."""
     
     isin: str | None = None
@@ -16,7 +16,7 @@ class InsiderTradeLookup(Document):
     transactionDate: datetime | None = None
 
 
-class InsiderTradeSourceMetadata(Document):
+class InsiderTradeSourceMetadata(BaseModel):
     """Embedded document for source-specific metadata."""
     
     # Common fields

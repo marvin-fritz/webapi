@@ -3,10 +3,10 @@
 from datetime import datetime, timezone
 
 from beanie import Document, PydanticObjectId
-from pydantic import Field
+from pydantic import BaseModel, Field
 
 
-class Stats(Document):
+class Stats(BaseModel):
     """Embedded document for news statistics."""
     
     likes: int = 0
