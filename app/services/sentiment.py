@@ -228,7 +228,10 @@ class SentimentService:
             {"$limit": 100},
         ]
 
-        isin_data = await InsiderTrade.aggregate(pipeline, allowDiskUse=True).to_list()
+        # Use motor collection directly for Beanie 2.x compatibility
+        collection = InsiderTrade.get_pymongo_collection()
+        cursor = collection.aggregate(pipeline, allowDiskUse=True)
+        isin_data = await cursor.to_list(length=None)
 
         # Jurisdiktions-Verteilung
         jurisdiction_stats: dict[str, dict[str, int]] = defaultdict(
@@ -459,7 +462,10 @@ class SentimentService:
             },
         ]
 
-        movers = await InsiderTrade.aggregate(pipeline, allowDiskUse=True).to_list()
+        # Use motor collection directly for Beanie 2.x compatibility
+        collection = InsiderTrade.get_pymongo_collection()
+        cursor = collection.aggregate(pipeline, allowDiskUse=True)
+        movers = await cursor.to_list(length=None)
 
         # ISO-Format für Daten
         for mover in movers:
@@ -688,7 +694,10 @@ class SentimentService:
                 },
             ]
 
-            result = await InsiderTrade.aggregate(pipeline, allowDiskUse=True).to_list()
+            # Use motor collection directly for Beanie 2.x compatibility
+            collection = InsiderTrade.get_pymongo_collection()
+            cursor = collection.aggregate(pipeline, allowDiskUse=True)
+            result = await cursor.to_list(length=None)
 
             logger.debug(f"Fetched {len(result)} days of transaction data")
             return result
