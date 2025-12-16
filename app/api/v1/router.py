@@ -2,12 +2,13 @@
 
 from fastapi import APIRouter
 
-from app.api.v1.endpoints import health, insider_trades, news, news_sources, search, sec_financials, sentiment, stocks
+from app.api.v1.endpoints import dashboard, health, insider_trades, news, news_sources, search, sec_financials, sentiment, stocks
 
 api_router = APIRouter(prefix="/api/v1")
 
 # Include endpoint routers
 api_router.include_router(health.router, tags=["Health"])
+api_router.include_router(dashboard.router, prefix="/dashboard", tags=["Dashboard"])
 api_router.include_router(search.router, prefix="/search", tags=["Search"])
 api_router.include_router(news_sources.router, prefix="/news-sources", tags=["News Sources"])
 api_router.include_router(news.router, prefix="/news", tags=["News"])

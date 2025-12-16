@@ -1,5 +1,6 @@
 """Service exports."""
 
+from app.services.dashboard import DashboardService
 from app.services.insider_trade import InsiderTradeService
 from app.services.news import NewsService
 from app.services.news_source import NewsSourceService
@@ -9,6 +10,7 @@ from app.services.sentiment import SentimentService
 from app.services.stock_index import StockIndexService
 
 __all__ = [
+    "DashboardService",
     "NewsService",
     "NewsSourceService",
     "InsiderTradeService",

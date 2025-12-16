@@ -1,5 +1,19 @@
 """Schema exports."""
 
+from app.schemas.dashboard import (
+    DashboardStatsResponse,
+    ExtendedStats,
+    InsiderTradesStats,
+    JurisdictionStats,
+    ProcessedPerHour,
+    ProcessingStats,
+    QuickStatsResponse,
+    TimeRange,
+    TopInsider,
+    TopTicker,
+    TradesByType,
+    VolumeByCurrency,
+)
 from app.schemas.health import HealthResponse
 from app.schemas.insider_trade import (
     InsiderTradeCreate,
