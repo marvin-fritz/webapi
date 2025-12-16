@@ -173,6 +173,10 @@ class SentimentService:
                                                             "award_or_grant",
                                                             "gift",
                                                             "tax_withholding_or_exercise_cost",
+                                                            "AWARD",
+                                                            "GIFT",
+                                                            "OPTION_EXERCISE",
+                                                            "TAX_WITHHOLDING",
                                                         ],
                                                     ]
                                                 }
@@ -200,6 +204,10 @@ class SentimentService:
                                                             "award_or_grant",
                                                             "gift",
                                                             "tax_withholding_or_exercise_cost",
+                                                            "AWARD",
+                                                            "GIFT",
+                                                            "OPTION_EXERCISE",
+                                                            "TAX_WITHHOLDING",
                                                         ],
                                                     ]
                                                 }
@@ -346,6 +354,10 @@ class SentimentService:
                                                             "award_or_grant",
                                                             "gift",
                                                             "tax_withholding_or_exercise_cost",
+                                                            "AWARD",
+                                                            "GIFT",
+                                                            "OPTION_EXERCISE",
+                                                            "TAX_WITHHOLDING",
                                                         ],
                                                     ]
                                                 }
@@ -373,6 +385,10 @@ class SentimentService:
                                                             "award_or_grant",
                                                             "gift",
                                                             "tax_withholding_or_exercise_cost",
+                                                            "AWARD",
+                                                            "GIFT",
+                                                            "OPTION_EXERCISE",
+                                                            "TAX_WITHHOLDING",
                                                         ],
                                                     ]
                                                 }
@@ -613,6 +629,10 @@ class SentimentService:
                                                     "award_or_grant",
                                                     "gift",
                                                     "tax_withholding_or_exercise_cost",
+                                                    "AWARD",
+                                                    "GIFT",
+                                                    "OPTION_EXERCISE",
+                                                    "TAX_WITHHOLDING",
                                                 ],
                                             ]
                                         }
@@ -632,6 +652,10 @@ class SentimentService:
                                                     "award_or_grant",
                                                     "gift",
                                                     "tax_withholding_or_exercise_cost",
+                                                    "AWARD",
+                                                    "GIFT",
+                                                    "OPTION_EXERCISE",
+                                                    "TAX_WITHHOLDING",
                                                 ],
                                             ]
                                         }
@@ -771,13 +795,14 @@ class SentimentService:
         for i in range(len(indicator_full)):
             current_value = indicator_full[i]["value"]
 
-            # 12-Monats-Durchschnitt berechnen (365 Tage zurück)
+            # 12-Monats-Durchschnitt berechnen (365 Tage zurück, exklusive aktueller Tag)
             lookback_start = max(0, i - cls.REFERENCE_PERIOD_DAYS)
-            reference_data = indicator_full[lookback_start:i] if i > 0 else [indicator_full[0]]
+            reference_data = indicator_full[lookback_start:i] if i > 0 else []
 
             if reference_data:
                 avg_12m = sum(d["value"] for d in reference_data) / len(reference_data)
             else:
+                # Keine vorherigen Daten verfügbar - neutral als Default
                 avg_12m = 50.0
 
             # Abweichung vom Durchschnitt
@@ -847,11 +872,12 @@ class SentimentService:
         if len(series) >= cls.REFERENCE_PERIOD_DAYS:
             for i in range(len(series)):
                 lookback_start = max(0, i - cls.REFERENCE_PERIOD_DAYS)
-                reference_data = series[lookback_start:i] if i > 0 else [series[0]]
+                reference_data = series[lookback_start:i] if i > 0 else []
 
                 if reference_data:
                     avg_12m = sum(d["value"] for d in reference_data) / len(reference_data)
                 else:
+                    # Keine vorherigen Daten - aktuellen Wert als Referenz verwenden
                     avg_12m = series[i]["value"]
 
                 series[i]["average12m"] = round(avg_12m, 2)

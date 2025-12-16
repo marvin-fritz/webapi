@@ -222,7 +222,12 @@ class SearchService:
         # Max 10 points for articles from today, decreasing over time
         from datetime import datetime, timezone
         if news.pubDate:
-            days_old = (datetime.now(timezone.utc) - news.pubDate).days
+            # Handle both offset-naive and offset-aware datetimes
+            pub_date = news.pubDate
+            if pub_date.tzinfo is None:
+                # If pubDate is offset-naive, assume UTC
+                pub_date = pub_date.replace(tzinfo=timezone.utc)
+            days_old = (datetime.now(timezone.utc) - pub_date).days
             recency_bonus = max(0, 10 - days_old)
             score += recency_bonus
         
