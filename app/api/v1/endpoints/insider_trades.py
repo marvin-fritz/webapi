@@ -9,6 +9,7 @@ from app.schemas.insider_trade import (
     InsiderTradeCreate,
     InsiderTradeListResponse,
     InsiderTradeResponse,
+    InsiderTradeSourceMetadata,
     InsiderTradeUpdate,
 )
 from app.services.insider_trade import InsiderTradeService
@@ -18,6 +19,22 @@ router = APIRouter()
 
 def _trade_to_response(trade) -> InsiderTradeResponse:
     """Convert InsiderTrade document to response schema."""
+    # Convert sourceMetadata from model to schema
+    source_metadata = None
+    if trade.sourceMetadata:
+        source_metadata = InsiderTradeSourceMetadata(
+            venue=trade.sourceMetadata.venue,
+            activationDate=trade.sourceMetadata.activationDate,
+            bafinId=trade.sourceMetadata.bafinId,
+            notificationSubmitterId=trade.sourceMetadata.notificationSubmitterId,
+            obligorFunctionCode=trade.sourceMetadata.obligorFunctionCode,
+            securityTypeCode=trade.sourceMetadata.securityTypeCode,
+            buySellIndicator=trade.sourceMetadata.buySellIndicator,
+            swxListed=trade.sourceMetadata.swxListed,
+            sdxListed=trade.sourceMetadata.sdxListed,
+            obligorRelatedPartyInd=trade.sourceMetadata.obligorRelatedPartyInd,
+        )
+    
     return InsiderTradeResponse(
         id=str(trade.id),
         uid=trade.uid,
@@ -37,7 +54,7 @@ def _trade_to_response(trade) -> InsiderTradeResponse:
         securityType=trade.securityType,
         shares=float(trade.shares) if trade.shares else None,
         source=trade.source,
-        sourceMetadata=trade.sourceMetadata,
+        sourceMetadata=source_metadata,
         totalAmount=float(trade.totalAmount) if trade.totalAmount else None,
         totalAmountSigned=float(trade.totalAmountSigned) if trade.totalAmountSigned else None,
         transactionDate=trade.transactionDate,
