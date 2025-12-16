@@ -1,6 +1,7 @@
 """REST API endpoints for Dashboard Statistics."""
 
 import logging
+import traceback
 
 from fastapi import APIRouter, HTTPException, Query
 
@@ -26,6 +27,10 @@ async def get_dashboard_stats(
     extended: bool = Query(
         True,
         description="Erweiterte Statistiken einschließen",
+    ),
+    debug: bool = Query(
+        False,
+        description="Debug-Modus für Fehlerdetails",
     ),
 ) -> DashboardStatsResponse:
     """
@@ -55,6 +60,8 @@ async def get_dashboard_stats(
         return stats
     except Exception as e:
         logger.error(f"Error in dashboard stats endpoint: {e}", exc_info=True)
+        if debug:
+            raise HTTPException(status_code=500, detail=f"Error: {e}\n{traceback.format_exc()}")
         raise HTTPException(status_code=500, detail="Internal server error")
 
 

@@ -69,9 +69,10 @@ class DashboardService:
         now = datetime.now(timezone.utc)
         from_date = now - timedelta(hours=hours)
 
-        # Build match filter
+        # Build match filter - use filingDate for "recent" data
+        # (transactionDate is when the trade happened, often weeks before filing)
         match_filter: dict[str, Any] = {
-            "transactionDate": {"$gte": from_date},
+            "filingDate": {"$gte": from_date},
         }
 
         # Main aggregation pipeline
@@ -142,14 +143,14 @@ class DashboardService:
                         {"$sort": {"totalVolume": -1}},
                     ],
                     
-                    # Hourly breakdown
+                    # Hourly breakdown (by filing date = when reported)
                     "hourlyBreakdown": [
                         {
                             "$group": {
                                 "_id": {
                                     "$dateToString": {
                                         "format": "%Y-%m-%dT%H:00:00.000Z",
-                                        "date": "$transactionDate",
+                                        "date": "$filingDate",
                                     }
                                 },
                                 "tradesCount": {"$sum": 1},
@@ -241,14 +242,16 @@ class DashboardService:
             },
         ]
 
+        # Use motor collection directly for Beanie 2.x compatibility
+        collection = InsiderTrade.get_pymongo_collection()
+        cursor = collection.aggregate(pipeline, allowDiskUse=True)
+        results = await cursor.to_list(length=None)
+        
+        if not results:
+            logger.warning(f"Dashboard aggregation returned no results for {hours}h")
+            return cls._empty_response(from_date, now, hours, tz)
+        
         try:
-            # Use motor collection directly for Beanie 2.x compatibility
-            collection = InsiderTrade.get_pymongo_collection()
-            cursor = collection.aggregate(pipeline, allowDiskUse=True)
-            results = await cursor.to_list(length=None)
-            
-            if not results:
-                return cls._empty_response(from_date, now, hours, tz)
             
             data = results[0]
             
@@ -387,8 +390,9 @@ class DashboardService:
         # Previous period for trend comparison
         prev_from = from_date - timedelta(hours=hours)
         
+        # Use filingDate for recent data (transactionDate is when trade happened, often weeks earlier)
         match_filter: dict[str, Any] = {
-            "transactionDate": {"$gte": from_date},
+            "filingDate": {"$gte": from_date},
             "transactionMethod": {"$nin": cls.EXCLUDED_METHODS},
         }
         
@@ -424,7 +428,7 @@ class DashboardService:
         prev_pipeline = [
             {
                 "$match": {
-                    "transactionDate": {"$gte": prev_from, "$lt": from_date},
+                    "filingDate": {"$gte": prev_from, "$lt": from_date},
                     "transactionMethod": {"$nin": cls.EXCLUDED_METHODS},
                 }
             },
