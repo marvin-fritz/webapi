@@ -13,7 +13,9 @@ class InsiderTradeService:
     """Service class for InsiderTrade operations."""
     
     # Transaction methods to exclude when filtering for real trades only
+    # Includes both lowercase (legacy) and uppercase (current) formats
     NON_TRADE_METHODS = [
+        # Lowercase format
         "award_or_grant",
         "gift",
         "tax_withholding_or_exercise_cost",
@@ -21,6 +23,17 @@ class InsiderTradeService:
         "exercise",
         "expiration",
         "discretionary_transaction",
+        # Uppercase format
+        "AWARD",
+        "GIFT",
+        "OPTION_EXERCISE",
+        "OPTION_EXPIRATION",
+        "CONVERSION",
+        "TAX_WITHHOLDING",
+        "DISCRETIONARY",
+        "GRANT",
+        "EXERCISE",
+        "EXPIRATION",
     ]
     
     @staticmethod
