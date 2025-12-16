@@ -79,6 +79,7 @@ async def get_all_insider_trades(
     toDate: datetime | None = Query(None, description="Filter trades up to this date"),
     minAmount: float | None = Query(None, description="Minimum transaction amount"),
     maxAmount: float | None = Query(None, description="Maximum transaction amount"),
+    excludeNonTrades: bool = Query(False, description="Exclude non-trade transactions (awards, gifts, tax withholdings)"),
 ) -> InsiderTradeListResponse:
     """Get all insider trades with pagination and filtering."""
     skip = (page - 1) * pageSize
@@ -96,6 +97,7 @@ async def get_all_insider_trades(
         to_date=toDate,
         min_amount=minAmount,
         max_amount=maxAmount,
+        exclude_non_trades=excludeNonTrades,
     )
     
     total = await InsiderTradeService.count(
@@ -109,6 +111,7 @@ async def get_all_insider_trades(
         to_date=toDate,
         min_amount=minAmount,
         max_amount=maxAmount,
+        exclude_non_trades=excludeNonTrades,
     )
     
     return InsiderTradeListResponse(

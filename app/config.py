@@ -27,7 +27,7 @@ class Settings(BaseSettings):
     mongodb_database: str = "financecentre"
 
     # Security
-    secret_key: str = "change-me-in-production"
+    secret_key: str = "f47600db-8127-4118-8cc6-572a86e2c506"
 
 
 @lru_cache

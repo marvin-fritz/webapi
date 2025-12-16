@@ -12,6 +12,17 @@ from app.schemas.insider_trade import InsiderTradeCreate, InsiderTradeUpdate
 class InsiderTradeService:
     """Service class for InsiderTrade operations."""
     
+    # Transaction methods to exclude when filtering for real trades only
+    NON_TRADE_METHODS = [
+        "award_or_grant",
+        "gift",
+        "tax_withholding_or_exercise_cost",
+        "conversion",
+        "exercise",
+        "expiration",
+        "discretionary_transaction",
+    ]
+    
     @staticmethod
     async def get_all(
         skip: int = 0,
@@ -26,6 +37,7 @@ class InsiderTradeService:
         to_date: datetime | None = None,
         min_amount: float | None = None,
         max_amount: float | None = None,
+        exclude_non_trades: bool = False,
     ) -> list[InsiderTrade]:
         """Get all insider trades with pagination and filtering."""
         query = {}
@@ -54,6 +66,8 @@ class InsiderTradeService:
         if max_amount is not None:
             query["totalAmount"] = query.get("totalAmount", {})
             query["totalAmount"]["$lte"] = max_amount
+        if exclude_non_trades:
+            query["transactionMethod"] = {"$nin": InsiderTradeService.NON_TRADE_METHODS}
         
         return await InsiderTrade.find(query).skip(skip).limit(limit).sort("-transactionDate").to_list()
     
@@ -130,6 +144,7 @@ class InsiderTradeService:
         to_date: datetime | None = None,
         min_amount: float | None = None,
         max_amount: float | None = None,
+        exclude_non_trades: bool = False,
     ) -> int:
         """Get the total count of insider trades with optional filtering."""
         query = {}
@@ -158,6 +173,8 @@ class InsiderTradeService:
         if max_amount is not None:
             query["totalAmount"] = query.get("totalAmount", {})
             query["totalAmount"]["$lte"] = max_amount
+        if exclude_non_trades:
+            query["transactionMethod"] = {"$nin": InsiderTradeService.NON_TRADE_METHODS}
         
         return await InsiderTrade.find(query).count()
     
