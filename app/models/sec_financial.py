@@ -5,7 +5,19 @@ from decimal import Decimal
 from typing import Any
 
 from beanie import Document
-from pydantic import Field
+from bson import Decimal128
+from pydantic import Field, field_validator
+
+
+def decimal128_to_decimal(v: Any) -> Decimal | None:
+    """Convert Decimal128 to Decimal."""
+    if v is None:
+        return None
+    if isinstance(v, Decimal128):
+        return Decimal(str(v))
+    if isinstance(v, (int, float, str, Decimal)):
+        return Decimal(str(v))
+    return v
 
 
 class SECFinancial(Document):
@@ -70,6 +82,22 @@ class SECFinancial(Document):
     # Additional raw data from SEC
     rawData: dict[str, Any] | None = None
     
+    # Validators to convert Decimal128 from MongoDB to Decimal
+    @field_validator(
+        "revenue", "costOfRevenue", "grossProfit", "operatingExpenses", "operatingIncome",
+        "netIncome", "eps", "epsDiluted", "totalAssets", "totalLiabilities", "totalEquity",
+        "cash", "totalDebt", "currentAssets", "currentLiabilities", "operatingCashFlow",
+        "investingCashFlow", "financingCashFlow", "freeCashFlow", "capitalExpenditures",
+        "profitMargin", "returnOnAssets", "returnOnEquity", "debtToEquity", "currentRatio",
+        mode="before"
+    )
+    @classmethod
+    def convert_decimal128(cls, v: Any) -> Decimal | None:
+        return decimal128_to_decimal(v)
+    
     class Settings:
         name = "sec_financials"  # MongoDB collection name
         use_state_management = True
+        bson_encoders = {
+            Decimal: lambda v: Decimal128(str(v)) if v is not None else None
+        }

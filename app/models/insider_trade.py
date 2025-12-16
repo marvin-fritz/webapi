@@ -2,9 +2,22 @@
 
 from datetime import datetime, timezone
 from decimal import Decimal
+from typing import Any
 
 from beanie import Document
-from pydantic import BaseModel, Field
+from bson import Decimal128
+from pydantic import BaseModel, Field, field_validator
+
+
+def decimal128_to_decimal(v: Any) -> Decimal | None:
+    """Convert Decimal128 to Decimal."""
+    if v is None:
+        return None
+    if isinstance(v, Decimal128):
+        return Decimal(str(v))
+    if isinstance(v, (int, float, str, Decimal)):
+        return Decimal(str(v))
+    return v
 
 
 class InsiderTradeLookup(BaseModel):
@@ -69,9 +82,15 @@ class InsiderTrade(Document):
     createdAt: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     updatedAt: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     
+    # Validators to convert Decimal128 from MongoDB to Decimal
+    @field_validator("pricePerShare", "shares", "totalAmount", "totalAmountSigned", mode="before")
+    @classmethod
+    def convert_decimal128(cls, v: Any) -> Decimal | None:
+        return decimal128_to_decimal(v)
+    
     class Settings:
         name = "insiderTrades"  # MongoDB collection name
         use_state_management = True
         bson_encoders = {
-            Decimal: lambda v: str(v) if v is not None else None
+            Decimal: lambda v: Decimal128(str(v)) if v is not None else None
         }
