@@ -54,6 +54,13 @@ from app.schemas.stock_index import (
     StockIndexUpdate,
     StockScans,
 )
+from app.schemas.ticker import (
+    TickerItem,
+    TickerMeta,
+    TickerResponse,
+    TickerSignal,
+    TickerSingleNotFoundResponse,
+)
 
 __all__ = [
     "HealthResponse",
@@ -95,4 +102,10 @@ __all__ = [
     "StockIndexResponse",
     "StockIndexUpdate",
     "StockScans",
+    # Ticker
+    "TickerItem",
+    "TickerMeta",
+    "TickerResponse",
+    "TickerSignal",
+    "TickerSingleNotFoundResponse",
 ]

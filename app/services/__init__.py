@@ -8,6 +8,7 @@ from app.services.search import SearchService
 from app.services.sec_financial import SECFinancialService
 from app.services.sentiment import SentimentService
 from app.services.stock_index import StockIndexService
+from app.services.ticker import TickerService
 
 __all__ = [
     "DashboardService",
@@ -18,4 +19,5 @@ __all__ = [
     "SECFinancialService",
     "SentimentService",
     "StockIndexService",
+    "TickerService",
 ]
